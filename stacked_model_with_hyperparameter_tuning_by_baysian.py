@@ -185,9 +185,12 @@ optimizer = BayesianOptimization(
 optimizer.maximize(init_points= INTIAL_POINTS, n_iter=N_ITERATIONS)
 gbcBoost_optimal_hyperparameter_values = optimizer.max
 
-learning_rate = gbcBoost_optimal_hyperparameter_values["params"]["learning_rate"]
-n_estimators = round(gbcBoost_optimal_hyperparameter_values["params"]["n_estimators"])
 
+n_estimators = round(gbcBoost_optimal_hyperparameter_values["params"]["n_estimators"])
+max_depth = round(gbcBoost_optimal_hyperparameter_values["params"]["max_depth"])
+learning_rate = gbcBoost_optimal_hyperparameter_values["params"]["learning_rate"]
+subsample = gbcBoost_optimal_hyperparameter_values["params"]["subsample"]
+min_samples_leaf = round(gbcBoost_optimal_hyperparameter_values["params"]["min_samples_leaf"])
 
 stacked_model_dict["GraBoost"] = GBC(n_estimators = n_estimators, learning_rate = learning_rate)
 

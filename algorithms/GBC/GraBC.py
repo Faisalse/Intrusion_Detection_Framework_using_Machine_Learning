@@ -8,19 +8,18 @@ from sklearn.ensemble import GradientBoostingClassifier
 import numpy as np
 
 class GBC:
-    def __init__(self, n_estimators = 30, learning_rate = 0.1, max_depth = None, min_samples_split = 10, 
+    def __init__(self, n_estimators = 30, learning_rate = 0.1, max_depth = None, 
                  min_samples_leaf = 1, subsample = 0.8):
         self.n_estimators = n_estimators
         self.learning_rate = learning_rate
         self.max_depth = max_depth
-        self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.subsample = subsample
         
     def fit(self, X, y):
         self.model = GradientBoostingClassifier(n_estimators = self.n_estimators, learning_rate = self.learning_rate, 
-                                                max_depth = self.max_depth, min_samples_split = self.min_samples_split, 
-                                                min_samples_leaf = self.min_samples_leaf, subsample = self.subsample, random_state=42)
+                                                max_depth = self.max_depth, min_samples_leaf = self.min_samples_leaf, 
+                                                subsample = self.subsample, random_state=42)
         self.model.fit(X, y)
         
     def predict(self, X):
