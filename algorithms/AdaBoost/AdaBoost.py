@@ -11,21 +11,19 @@ import numpy as np
 class AdaBoost:
     def __init__(self, n_estimators = 50, learning_rate = 1.0):
         
-        self.n_estimators = n_estimators
-        self.learning_rate = learning_rate
+        self.n_estimators = int(n_estimators)
+        self.learning_rate = float(learning_rate)
+        
         
     def fit(self, X, y):
         self.model = AdaBoostClassifier(n_estimators = self.n_estimators, learning_rate = self.learning_rate)
-        
         self.model.fit(X, y)
         
     def predict(self, X):
-
         y_predict = self.model.predict(X)
         return y_predict
     
     def predict_proba(self, X):
-
         y_predict_prob = self.model.predict_proba(X)
         return y_predict_prob
     
