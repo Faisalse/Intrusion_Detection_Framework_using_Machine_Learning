@@ -30,6 +30,7 @@ from Optimization_files.opt_CatBoost import *
 from Optimization_files.opt_LightGBM import *
 from Optimization_files.opt_XGBoost import *
 from Optimization_files.opt_AdaBoost import *
+from Optimization_files.opt_GraBoost import *
 
 from functools import partial
 from sklearn.model_selection import StratifiedKFold
@@ -167,6 +168,31 @@ meta_features_testX, meta_features_testY, result_dataframe = return_metafeatures
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR AdaBOOST #################################
 stacked_model_dict = dict()
 opt_func = partial(
+    optimize_gbc,
+    X_train=meta_features_trainX,
+    y_train=meta_features_trainY,
+    X_valid=meta_features_testX,
+    y_valid=meta_features_testY
+)
+
+optimizer = BayesianOptimization(
+    f=opt_func,
+    pbounds=gbcbounds,
+    random_state=42,
+    verbose=2
+)
+
+optimizer.maximize(init_points= INTIAL_POINTS, n_iter=N_ITERATIONS)
+gbcBoost_optimal_hyperparameter_values = optimizer.max
+
+learning_rate = gbcBoost_optimal_hyperparameter_values["params"]["learning_rate"]
+n_estimators = round(gbcBoost_optimal_hyperparameter_values["params"]["n_estimators"])
+
+
+stacked_model_dict["GraBoost"] = GBC(n_estimators = n_estimators, learning_rate = learning_rate)
+
+############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR AdaBOOST #################################
+opt_func = partial(
     optimize_adaboost,
     X_train=meta_features_trainX,
     y_train=meta_features_trainY,
@@ -184,17 +210,10 @@ optimizer = BayesianOptimization(
 optimizer.maximize(init_points= INTIAL_POINTS, n_iter=N_ITERATIONS)
 AdaBoost_optimal_hyperparameter_values = optimizer.max
 
-
-learning_rate = AdaBoost_optimal_hyperparameter_values["params"]["depth"]
+learning_rate = AdaBoost_optimal_hyperparameter_values["params"]["learning_rate"]
 n_estimators = round(AdaBoost_optimal_hyperparameter_values["params"]["n_estimators"])
-
-
-stacked_model_dict["AdaBoost"] = AdaBoost(learning_rate = learning_rate, n_estimators = n_estimators)
-
-
-
+stacked_model_dict["AdaBoost"] = AdaBoost(n_estimators = n_estimators, learning_rate = learning_rate)
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR CatBOOST #################################
-stacked_model_dict = dict()
 opt_func = partial(
     optimize_catb,
     X_train=meta_features_trainX,
