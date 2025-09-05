@@ -11,7 +11,7 @@ lightbounds = {
     "min_child_samples": (5, 100)           # Integer
 }
 
-def optimize_lightb(n_estimators, learning_rate, max_depth, num_leaves, min_child_samples, X, y, cv):
+def optimize_lightb(n_estimators, learning_rate, max_depth, num_leaves, min_child_samples, X_train, y_train, X_valid, y_valid):
     model = LightB(
         n_estimators=int(n_estimators),
         learning_rate=learning_rate,
@@ -20,9 +20,8 @@ def optimize_lightb(n_estimators, learning_rate, max_depth, num_leaves, min_chil
         min_child_samples=int(min_child_samples)
     )
 
-    f1_macro = make_scorer(f1_score, average='macro')
-    scores = cross_val_score(model, X, y, cv=cv, scoring=f1_macro)
-
-    return scores.mean()
+    model.fit(X_train, y_train)
+    accuracy = model.model.score(X_valid, y_valid)
+    return accuracy
     
 

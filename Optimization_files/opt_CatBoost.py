@@ -12,15 +12,14 @@ catbounds = {
 
 
 
-def optimize_catb(iterations, learning_rate, depth, l2_leaf_reg, X, y, cv):
+def optimize_catb(iterations, learning_rate, depth, l2_leaf_reg, X_train, y_train, X_valid, y_valid):
     model = CatB(
         iterations=int(iterations),
         learning_rate=learning_rate,
         depth=int(depth),
         l2_leaf_reg=l2_leaf_reg
     )
-    # Cross-validation with F1-macro scoring
-    f1_macro = make_scorer(f1_score, average='macro')
-    scores = cross_val_score(model, X, y, cv=cv, scoring=f1_macro)
-    return scores.mean()
+    model.fit(X_train, y_train)
+    accuracy = model.model.score(X_valid, y_valid)
+    return accuracy
 

@@ -9,23 +9,25 @@ from sklearn.ensemble import AdaBoostClassifier
 import numpy as np
 
 class AdaBoost:
-    def __init__(self, n_estimators = 30, learning_rate = 0.1, depth = 4, l2_leaf_reg = 1):
+    def __init__(self, n_estimators = 50, learning_rate = 1.0):
         
         self.n_estimators = n_estimators
         self.learning_rate = learning_rate
         
-       
+    def fit(self, X, y):
+        self.model = AdaBoostClassifier(n_estimators = self.n_estimators, learning_rate = self.learning_rate)
         
-    def fit(self, train, test):
-        clf = AdaBoostClassifier(n_estimators = self.n_estimators, learning_rate = self.learning_rate)
+        self.model.fit(X, y)
         
-        clf.fit(train.iloc[:, :-1], train.iloc[:, -1])
-        self.clf = clf
-        
-    def predict(self, test):
-        
-        y_predict = self.clf.predict_proba(test.iloc[:,:-1])
-        return np.round(y_predict[:, 1])
+    def predict(self, X):
+
+        y_predict = self.model.predict(X)
+        return y_predict
+    
+    def predict_proba(self, X):
+
+        y_predict_prob = self.model.predict_proba(X)
+        return y_predict_prob
     
     def clear(self):
         self.n_estimators = 0

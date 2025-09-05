@@ -24,6 +24,3 @@ def optimize_dtree(max_depth, criterion, splitter, X, y, cv):
     scores = cross_val_score(model, X, y, cv=cv, scoring=f1_macro)
     return scores.mean()
 
-
-    return scores.mean()
-

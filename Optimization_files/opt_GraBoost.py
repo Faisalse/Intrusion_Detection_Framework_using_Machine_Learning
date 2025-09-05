@@ -14,7 +14,7 @@ xgbounds = {
 }
 
 
-def optimize_xgb(n_estimators, max_depth, learning_rate, subsample, colsample_bytree,
+def optimize_model(n_estimators, max_depth, learning_rate, subsample, colsample_bytree,
                    gamma, reg_alpha, reg_lambda,
                    X_train, y_train, X_valid, y_valid):
     

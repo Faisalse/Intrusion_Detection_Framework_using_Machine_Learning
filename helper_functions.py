@@ -7,13 +7,7 @@ import random
 import pandas as pd
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.manifold import TSNE
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.impute import SimpleImputer
+import time
 
 def apply_random_scaling_df_global(df, ratio=0.1, scale=0.1, seed=43):
     """
@@ -131,6 +125,7 @@ def return_metafeatures_for_single_splits(X_train, y_train, X_test, y_test, mode
     # results with full data
     for key in models_object_dict.keys():
         print(f"*********************** Results with full data: {key} ***********************")
+        start = time.time()
         models_object_dict[key].fit(X_train, y_train)
 
         
@@ -147,7 +142,9 @@ def return_metafeatures_for_single_splits(X_train, y_train, X_test, y_test, mode
             acc_object.compute(y_predict, y_test)
             temp[acc_key] = round(acc_object.result()[1], 4)
             print(acc_object.result())
-
+            
+        end = time.time()
+        temp["time"] = end - start
         result_dataframe[str(key)] = temp
     
     meta_features_df = pd.DataFrame()
@@ -168,13 +165,13 @@ def stacked_model_object_dictAND_accuracy_dict(X_train, y_train, X_test, y_test,
     result_dataframe = dict()
     for key in models_object_dict.keys():
         print(f"*********************** Results with full data: {key} ***********************")
+        start = time.time()
         models_object_dict[key].fit(X_train, y_train)
         
 
         y_predict = models_object_dict[key].predict(X_test)
         y_predict_prob = models_object_dict[key].predict_proba(X_test)
 
-        X_test
           
         # print accuracy values on out of fold
         temp = dict()
@@ -182,6 +179,9 @@ def stacked_model_object_dictAND_accuracy_dict(X_train, y_train, X_test, y_test,
             acc_object.compute(y_predict, y_test)
             print(acc_object.result())
             temp[acc_key] = round(acc_object.result()[1], 4)
+        
+        end = time.time()
+        temp["time"] = end - start
         result_dataframe[key] = temp
         
 

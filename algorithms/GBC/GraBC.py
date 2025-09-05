@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Jul  8 16:21:37 2023
-
 @author: shefai
 """
 
@@ -16,18 +15,21 @@ class GBC:
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         
-    def fit(self, train, test):
-        clf = GradientBoostingClassifier(n_estimators = self.n_estimators, learning_rate = self.learning_rate,  max_depth = self.max_depth,
+    def fit(self, X, y):
+        self.model = GradientBoostingClassifier(n_estimators = self.n_estimators, learning_rate = self.learning_rate,  max_depth = self.max_depth,
                                      min_samples_split = self.min_samples_split,
                                      min_samples_leaf = self.min_samples_leaf)
+        self.model.fit(X, y)
         
-        clf.fit(train.iloc[:, :-1], train.iloc[:, -1])
-        self.clf = clf
-        
-    def predict(self, test):
-        
-        y_predict = self.clf.predict_proba(test.iloc[:,:-1])
-        return np.round(y_predict[:, 1])
+    def predict(self, X):
+
+        y_predict = self.model.predict(X)
+        return y_predict
+    
+    def predict_proba(self, X):
+
+        y_predict_prob = self.model.predict_proba(X)
+        return y_predict_prob
     
     def clear(self):
         self.n_estimators = 0

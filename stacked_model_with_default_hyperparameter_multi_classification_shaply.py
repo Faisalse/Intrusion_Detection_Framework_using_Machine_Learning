@@ -7,8 +7,6 @@ from sklearn.tree import DecisionTreeClassifier
 DATA_PATH = r'./data/raw/'
 data_name = "ToN_IoT_train_test_network"
 
-
-
 X, y = data_load(DATA_PATH, data_name)
 X_train, X_test, y_train, y_test = split_data_train_test(X, y)
 
@@ -19,6 +17,5 @@ explainer = shap.Explainer(model, X_train)
 shap_values = explainer(X_test)
 shap.summary_plot(shap_values, X_test)
 
-# (D) Dependence plot (pick a specific feature)
-# shap.plots.scatter(shap_values[:, "num__your_numeric_feature"])
+
 
