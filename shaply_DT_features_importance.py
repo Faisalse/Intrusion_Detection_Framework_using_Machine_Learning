@@ -1,4 +1,4 @@
-from preprocessing.TON_IOT_multi_classification import *
+from preprocessing.TON_IOT_binary import *
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 # Train a machine learning model
@@ -14,7 +14,7 @@ from pathlib import Path
 DATA_PATH = r'./data/raw/'
 data_name = "ToN_IoT_train_test_network"
 
-path = Path("results/multi/")
+path = Path("results/")
 path.mkdir(parents=True, exist_ok=True)
 
 X, y = data_load(DATA_PATH, data_name)
@@ -42,3 +42,7 @@ fig.set_size_inches(8, 6)
 
 plt.savefig(path /"shaply_summary.pdf", format="pdf", bbox_inches="tight")
 plt.close(fig)
+
+shap.summary_plot(shap_values[0], X_test)
+print("Faisal")
+shap.decision_plot(explainer.expected_value[0], shap_values[0], X_test.columns, ignore_warnings=True)

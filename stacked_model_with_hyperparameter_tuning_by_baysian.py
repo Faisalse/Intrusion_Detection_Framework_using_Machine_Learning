@@ -4,7 +4,7 @@ from preprocessing.TON_IOT_multi_classification import *
 from helper_functions import *
 from bayes_opt import BayesianOptimization
 from accuracy.multi_accuracy import *
-
+import time
 # baselines
 from algorithms.DTree.DTree import * 
 from algorithms.MLP.MLP import *
@@ -36,6 +36,7 @@ from functools import partial
 from sklearn.model_selection import StratifiedKFold
 
 models_object_dict = dict()
+models_object_dict_time = dict()
 ############################# LOAD DATASET #############################################################
 DATA_PATH = r'./data/raw/'
 data_name = "ToN_IoT_train_test_network"
@@ -43,12 +44,13 @@ data_name = "ToN_IoT_train_test_network"
 X, y = data_load(DATA_PATH, data_name)
 X_train, X_test, y_train, y_test = split_data_train_test(X, y)
 
-INTIAL_POINTS = 1
-N_ITERATIONS = 1
+INTIAL_POINTS = 5
+N_ITERATIONS = 45
 cv_strategy = StratifiedKFold(n_splits=5)
 
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR SVM ###############################
 """
+start = time.time()
 opt_func = partial(optimize_svm, X= X_train, y=y_train, cv=cv_strategy)
 optimizer = BayesianOptimization(
     f=opt_func,
@@ -58,17 +60,18 @@ optimizer = BayesianOptimization(
 )
 
 optimizer.maximize(init_points = INTIAL_POINTS, n_iter = N_ITERATIONS)
-DT_optimal_hyperparameter_values = optimizer.max
+SVM_optimal_hyperparameter_values = optimizer.max
 
-criterion = criterion_map[round(DT_optimal_hyperparameter_values["params"]["criterion"] )]
-splitter = splitter_map[round(DT_optimal_hyperparameter_values["params"]['splitter'])]
+C = C_map[round(SVM_optimal_hyperparameter_values["params"]["C"] )]
 
-models_object_dict["DT"] = DTree(criterion = criterion, 
-                                 max_depth = DT_optimal_hyperparameter_values["params"]['max_depth'], 
-                                 splitter = splitter)
-
+models_object_dict["SVM"] = SVM()
+models_object_dict_time["SVM"] = time.time() - start
 """
+models_object_dict["SVM"] = SVM()
+models_object_dict_time["SVM"] = 0
+
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR DT #################################
+start = time.time()
 opt_func = partial(optimize_dtree, X= X_train, y=y_train, cv=cv_strategy)
 optimizer = BayesianOptimization(
     f=opt_func,
@@ -87,8 +90,11 @@ models_object_dict["DT"] = DTree(criterion = criterion,
                                  max_depth = DT_optimal_hyperparameter_values["params"]['max_depth'], 
                                  splitter = splitter)
 
-"""
+models_object_dict_time["DT"] = time.time() - start
+
+
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR LR #################################
+start = time.time()
 opt_func = partial(optimize_lr, X = X_train, y = y_train, cv = cv_strategy)
 optimizer = BayesianOptimization(
     f=opt_func,
@@ -103,9 +109,11 @@ lr_optimal_hyperparameter_values = optimizer.max
 solver = solver_map[round(lr_optimal_hyperparameter_values["params"]["solver"])]
 penalty = penalty_map[round(lr_optimal_hyperparameter_values["params"]["penalty"])]
 C = round(lr_optimal_hyperparameter_values["params"]["C"])
-models_object_dict["LR"] = LR(solver = solver, penalty = penalty, C = C)
 
+models_object_dict["LR"] = LR(solver = solver, penalty = penalty, C = C)
+models_object_dict_time["LR"] = time.time() - start
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR NB #################################
+start  = time.time()
 opt_func = partial(optimize_nb, X = X_train, y = y_train, cv = cv_strategy)
 optimizer = BayesianOptimization(
     f=opt_func,
@@ -117,8 +125,10 @@ optimizer = BayesianOptimization(
 optimizer.maximize(init_points= INTIAL_POINTS, n_iter=N_ITERATIONS)
 nb_optimal_hyperparameter_values = optimizer.max
 models_object_dict["NB"] = NB(var_smoothing = nb_optimal_hyperparameter_values['params']['var_smoothing'])
+models_object_dict_time["NB"] = time.time() - start
 
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR MLP #################################
+start = time.time()
 opt_func = partial(optimize_mlp, X = X_train, y = y_train, cv = cv_strategy)
 optimizer = BayesianOptimization(
     f=opt_func,
@@ -140,10 +150,7 @@ max_iter = round(mLP_optimal_hyperparameter_values["params"]["max_iter"])
 
 models_object_dict["MLP"] = MLP(hidden_layer_sizes = (hidden1, hidden2), alpha = alpha,
                  learning_rate = learning_rate, learning_rate_init = learning_rate_init, max_iter = max_iter)
-
-"""
-
-
+models_object_dict_time["MLP"] = time.time() - start
 
 
 ############################# ACCURACY MEASURES #################################
@@ -165,7 +172,8 @@ meta_features_testX, meta_features_testY, result_dataframe = return_metafeatures
 
 ################## Stacked models ##############################################################################
 
-############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR AdaBOOST #################################
+############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR GraBOOST #################################
+start = time.time()
 stacked_model_dict = dict()
 opt_func = partial(
     optimize_gbc,
@@ -192,9 +200,11 @@ learning_rate = gbcBoost_optimal_hyperparameter_values["params"]["learning_rate"
 subsample = gbcBoost_optimal_hyperparameter_values["params"]["subsample"]
 min_samples_leaf = round(gbcBoost_optimal_hyperparameter_values["params"]["min_samples_leaf"])
 
-stacked_model_dict["GraBoost"] = GBC(n_estimators = n_estimators, learning_rate = learning_rate)
-
+stacked_model_dict["GraBoost (stacked)"] = GBC(n_estimators = n_estimators, learning_rate = learning_rate, max_depth = max_depth, 
+                                     min_samples_leaf  = min_samples_leaf, subsample = subsample)
+models_object_dict_time["GraBoost (stacked)"] = time.time() - start
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR AdaBOOST #################################
+start = time.time()
 opt_func = partial(
     optimize_adaboost,
     X_train=meta_features_trainX,
@@ -210,13 +220,15 @@ optimizer = BayesianOptimization(
     verbose=2
 )
 
-optimizer.maximize(init_points= INTIAL_POINTS, n_iter=N_ITERATIONS)
+optimizer.maximize(init_points= INTIAL_POINTS, n_iter=20)
 AdaBoost_optimal_hyperparameter_values = optimizer.max
 
 learning_rate = AdaBoost_optimal_hyperparameter_values["params"]["learning_rate"]
 n_estimators = round(AdaBoost_optimal_hyperparameter_values["params"]["n_estimators"])
-stacked_model_dict["AdaBoost"] = AdaBoost(n_estimators = n_estimators, learning_rate = learning_rate)
+stacked_model_dict["AdaBoost (stacked)"] = AdaBoost(n_estimators = n_estimators, learning_rate = learning_rate)
+models_object_dict_time["AdaBoost (stacked)"] = time.time() - start
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR CatBOOST #################################
+start = time.time()
 opt_func = partial(
     optimize_catb,
     X_train=meta_features_trainX,
@@ -240,9 +252,10 @@ iterations = round(CatBoost_optimal_hyperparameter_values["params"]["iterations"
 learning_rate = CatBoost_optimal_hyperparameter_values["params"]["learning_rate"]
 l2_leaf_reg = CatBoost_optimal_hyperparameter_values["params"]["l2_leaf_reg"]
 
-stacked_model_dict["CatB"] = CatB(iterations = iterations, learning_rate = learning_rate, depth = depth, l2_leaf_reg = l2_leaf_reg)
-
+stacked_model_dict["CatBoost (stacked)"] = CatB(iterations = iterations, learning_rate = learning_rate, depth = depth, l2_leaf_reg = l2_leaf_reg)
+models_object_dict_time["CatBoost (stacked)"] = time.time() - start
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR LIGHTGBM #################################
+start = time.time()
 opt_func = partial(
     optimize_lightb,
     X_train=meta_features_trainX,
@@ -267,10 +280,11 @@ max_depth = round(lightBoost_optimal_hyperparameter_values['params']["max_depth"
 num_leaves = round(lightBoost_optimal_hyperparameter_values['params']["num_leaves"])
 min_child_samples = round(lightBoost_optimal_hyperparameter_values['params']["min_child_samples"])
 
-stacked_model_dict["LightB"] = LightB(n_estimators = n_estimators, learning_rate = learning_rate, max_depth = max_depth, 
+stacked_model_dict["LightBoost (stacked)"] = LightB(n_estimators = n_estimators, learning_rate = learning_rate, max_depth = max_depth, 
                  num_leaves = num_leaves, min_child_samples = min_child_samples)
-
+models_object_dict_time["LightBoost (stacked)"] = time.time() - start
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR XGBoost #################################
+start = time.time()
 opt_func = partial(
     optimize_xgb,
     X_train=meta_features_trainX,
@@ -298,9 +312,11 @@ reg_alpha = xgBoost_optimal_hyperparameter_values["params"]["reg_alpha"]
 reg_lambda = xgBoost_optimal_hyperparameter_values["params"]["reg_lambda"]
 
 
-stacked_model_dict["XGBoost"] = XGBoost(n_estimators = n_estimators, max_depth = max_depth, learning_rate = learning_rate, subsample = subsample, 
+stacked_model_dict["XGBoost (stacked)"] = XGBoost(n_estimators = n_estimators, max_depth = max_depth, learning_rate = learning_rate, subsample = subsample, 
                                         colsample_bytree = colsample_bytree, 
                                         gamma = gamma, reg_alpha = reg_alpha, reg_lambda = reg_lambda)
+models_object_dict_time["XGBoost (stacked)"] = time.time() - start
+
 
 results_stacked = stacked_model_object_dictAND_accuracy_dict(meta_features_trainX, meta_features_trainY, meta_features_testX, 
                                            meta_features_testY, stacked_model_dict, accuracy_objects_dict)
@@ -309,5 +325,9 @@ results_stacked = stacked_model_object_dictAND_accuracy_dict(meta_features_train
 print("Print and save final results")
 for key in results_stacked.keys():
     result_dataframe[key] = results_stacked[key]
+
+for key in models_object_dict_time.keys():
+    result_dataframe[key]["tuning_time"] = models_object_dict_time[key]
+
 df = pd.DataFrame.from_dict(result_dataframe, orient="index")
 df.to_csv(path / "optimalHyperparameters.txt", index = True, sep = "\t")

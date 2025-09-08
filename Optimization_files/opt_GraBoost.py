@@ -11,7 +11,7 @@ gbcbounds = {
 }
 
 
-def optimize_model(n_estimators, max_depth, learning_rate, subsample, min_samples_leaf, X_train, y_train, X_valid, y_valid):
+def optimize_gbc(n_estimators, max_depth, learning_rate, subsample, min_samples_leaf, X_train, y_train, X_valid, y_valid):
     
     model = GBC(
         n_estimators=int(n_estimators),
