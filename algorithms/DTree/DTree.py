@@ -30,6 +30,9 @@ class DTree(BaseEstimator, ClassifierMixin):
         y_predict_prob = self.model.predict_proba(X)
         return y_predict_prob
     
+    def use_hyperparameter_value(self):
+        return f"Max_depth: {int(self.max_depth)} criterion: {self.criterion} splitter: {self.splitter}"
+    
     def clear(self):
         self.max_depth = 0
         self.criterion = ""

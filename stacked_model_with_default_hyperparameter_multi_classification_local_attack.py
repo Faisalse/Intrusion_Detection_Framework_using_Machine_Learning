@@ -81,14 +81,14 @@ colors = [
     '#17becf'   # cyan/teal
 ]
 import matplotlib.pyplot as plt
-
-x = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+x = [0, 0.01, 0.02, 0.03, 0.04, 0.05]
 i = 0
-for key in result_dict.keys():
+stacked_model_dict["DT"] = models_object_dict["DT"]
+for key in stacked_model_dict.keys():
     plt.plot(x, result_dict[key], color=colors[i], marker=markers[i], linestyle='--', linewidth=2, markersize=8, 
              markerfacecolor='white', markeredgecolor='black', label= key ,alpha=0.9)
     i = i + 1    
-x1 = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+x1 = [0, 0.01, 0.02, 0.03, 0.04, 0.05]
 plt.xticks(x, x1)
 # Add labels and title
 plt.ylabel('Accuracy')

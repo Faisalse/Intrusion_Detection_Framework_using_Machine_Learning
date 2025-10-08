@@ -15,6 +15,9 @@ class LR(BaseEstimator, ClassifierMixin):
         self.solver = solver
         self.penalty = penalty
         self.C = C
+
+    def use_hyperparameter_value(self):
+        return f"solver: {str(self.solver)} penalty: {str(self.penalty)} C: {str(self.C)}"
              
         
     def fit(self, X, y):

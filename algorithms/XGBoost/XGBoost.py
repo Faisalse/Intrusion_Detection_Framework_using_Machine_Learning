@@ -21,8 +21,10 @@ class XGBoost(BaseEstimator, ClassifierMixin):
         self.reg_alpha = reg_alpha
         self.reg_lambda = reg_lambda
 
+    def use_hyperparameter_value(self):
+        return f"n_estimators: {str(self.n_estimators)} max_depth: {str(self.max_depth)} subsample: {str(self.subsample)} colsample_bytree: {str(self.colsample_bytree)}  gamma: {str(self.gamma)} reg_alpha: {str(self.reg_alpha)}  reg_lambda: {str(self.reg_lambda)}"
+
        
-        
     def fit(self, X, y):
 
         if len(np.unique(y)) > 2:

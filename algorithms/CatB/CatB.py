@@ -17,6 +17,8 @@ class CatB(BaseEstimator, ClassifierMixin):
         self.depth = depth
         self.l2_leaf_reg = l2_leaf_reg
        
+    def use_hyperparameter_value(self):
+        return f"iterations: {str(self.iterations)} learning_rate: {str(self.learning_rate)} depth: {str(self.depth)},  l2_leaf_reg: {str(self.l2_leaf_reg)}"
         
     def fit(self, X, y):
 

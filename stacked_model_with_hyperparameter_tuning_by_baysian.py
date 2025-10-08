@@ -5,6 +5,7 @@ from helper_functions import *
 from bayes_opt import BayesianOptimization
 from accuracy.multi_accuracy import *
 import time
+import csv
 # baselines
 from algorithms.DTree.DTree import * 
 from algorithms.MLP.MLP import *
@@ -44,8 +45,8 @@ data_name = "ToN_IoT_train_test_network"
 X, y = data_load(DATA_PATH, data_name)
 X_train, X_test, y_train, y_test = split_data_train_test(X, y)
 
-INTIAL_POINTS = 5
-N_ITERATIONS = 45
+INTIAL_POINTS =5
+N_ITERATIONS = 50
 cv_strategy = StratifiedKFold(n_splits=5)
 
 ############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR SVM ###############################
@@ -331,3 +332,16 @@ for key in models_object_dict_time.keys():
 
 df = pd.DataFrame.from_dict(result_dataframe, orient="index")
 df.to_csv(path / "optimalHyperparameters.txt", index = True, sep = "\t")
+
+
+merged = {**stacked_model_dict, **models_object_dict}
+merged2 = dict() 
+for key in merged.keys():
+    merged2[key] = merged[key].use_hyperparameter_value()
+with open(path /"optimal_hyperparameterValue.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Model", "Optimal Hyperparameter Values"])  # header
+    for key, value in merged2.items():
+        writer.writerow([key, value])
+
+

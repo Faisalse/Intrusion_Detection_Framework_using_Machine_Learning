@@ -15,6 +15,9 @@ class GBC:
         self.max_depth = max_depth
         self.min_samples_leaf = min_samples_leaf
         self.subsample = subsample
+
+    def use_hyperparameter_value(self):
+        return f"n_estimators: {str(self.n_estimators)} learning_rate: {str(self.learning_rate)} max_depth: {str(self.max_depth)},  min_samples_leaf: {str(self.min_samples_leaf)} subsample: {str(self.subsample)}"
         
     def fit(self, X, y):
         self.model = GradientBoostingClassifier(n_estimators = self.n_estimators, learning_rate = self.learning_rate, 

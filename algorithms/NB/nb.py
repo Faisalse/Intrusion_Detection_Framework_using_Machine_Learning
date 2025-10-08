@@ -10,6 +10,9 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 class NB(BaseEstimator, ClassifierMixin):
     def __init__(self, var_smoothing = 0.000001):
         self.var_smoothing = var_smoothing
+
+    def use_hyperparameter_value(self):
+        return f"var_smooting: {str(self.var_smoothing)}"
         
     def fit(self, X, y):
         model = GaussianNB(var_smoothing=self.var_smoothing)

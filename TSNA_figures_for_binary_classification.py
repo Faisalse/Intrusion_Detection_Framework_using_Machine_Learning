@@ -2,7 +2,10 @@ from preprocessing.TON_IOT_binary import *
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 from pathlib import Path
+from sklearn.metrics import silhouette_score
 from matplotlib.lines import Line2D
+from sklearn.neighbors import NearestNeighbors
+k_neighbors=10
 ###############################################################################
 def tsne_visualization(X, y, label_col='label', perplexity=100, random_state=42):
     
@@ -24,6 +27,16 @@ def tsne_visualization(X, y, label_col='label', perplexity=100, random_state=42)
     # ---- Make labels categorical + stable order ----
     cats, inv = np.unique(y_arr, return_inverse=True)  # cats = sorted unique labels, inv = codes 0..K-1
     K = len(cats)
+    sil = silhouette_score(df, y_arr, metric="euclidean")
+    # NN-purity in embedding space
+    nn = NearestNeighbors(n_neighbors=k_neighbors + 1, metric="euclidean").fit(df)
+    _, idx = nn.kneighbors(df)
+    # exclude the point itself at idx[:, 0]
+    neighbor_labels = y_arr[idx[:, 1:]]
+    same = (neighbor_labels == y_arr[:, None]).sum(axis=1)
+    nn_purity = float(np.mean(same / k_neighbors))
+
+    print(f"silhouette = {sil:.4f}, NN-purity = {nn_purity:.4f}")
 
     # ---- Pick K distinct colors (tab10 or tab20) ----
     cmap = plt.cm.get_cmap("tab10" if K <= 10 else "tab20")

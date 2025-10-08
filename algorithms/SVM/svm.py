@@ -16,7 +16,10 @@ class SVM:
         self.class_weight = class_weight
         self.cache_size = cache_size
         self.model = None
-
+    
+    def use_hyperparameter_value(self):
+        return f"C: {str(self.C)} kernel: {str(self.kernel)} gamma: {str(self.gamma)} probability: {str(self.probability)}"
+    
     def fit(self, X, y):
         # SVC handles multiclass natively; just choose decision_function_shape
         self.model = svm.SVC(

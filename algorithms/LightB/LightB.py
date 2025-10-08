@@ -20,6 +20,9 @@ class LightB(BaseEstimator, ClassifierMixin):
         self.max_depth = max_depth
         self.num_leaves = num_leaves
         self.min_child_samples = min_child_samples
+    
+    def use_hyperparameter_value(self):
+        return f"n_estimators: {str(self.n_estimators)} learning_rate: {str(self.learning_rate)} max_depth: {str(self.max_depth)},  num_leaves: {str(self.num_leaves)} min_child_samples: {str(self.min_child_samples)}"
         
     def fit(self, X, y):
         if len(np.unique(y)) > 2:

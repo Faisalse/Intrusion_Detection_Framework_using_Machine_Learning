@@ -17,6 +17,9 @@ class MLP(BaseEstimator, ClassifierMixin):
         self.learning_rate_init = learning_rate_init
         self.max_iter = max_iter
 
+    def use_hyperparameter_value(self):
+        return f"hidden_layer_sizes: {str(self.hidden_layer_sizes)} penaalphalty: {str(self.alpha)} learning_rate: {str(self.learning_rate)} learning_rate_init: {str(self.learning_rate_init)}  max_iter: {str(self.max_iter)}"
+
     def fit(self, X, y):
         
         model = MLPClassifier(hidden_layer_sizes=self.hidden_layer_sizes, activation='relu', 

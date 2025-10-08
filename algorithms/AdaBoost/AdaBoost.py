@@ -18,6 +18,9 @@ class AdaBoost:
     def fit(self, X, y):
         self.model = AdaBoostClassifier(n_estimators = self.n_estimators, learning_rate = self.learning_rate)
         self.model.fit(X, y)
+
+    def use_hyperparameter_value(self):
+        return f"n_estimators: {str(self.n_estimators)} learning_rate: {str(self.learning_rate)}"
         
     def predict(self, X):
         y_predict = self.model.predict(X)

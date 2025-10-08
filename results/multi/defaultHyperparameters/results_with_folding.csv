@@ -1,7 +1,7 @@
 	measure
-DT_fold_0	0.9235
-DT_fold_1	0.9256
-DT_fold_2	0.9257
+DT_fold_0	0.9237
+DT_fold_1	0.9257
+DT_fold_2	0.9255
 DT_fold_3	0.9233
 DT_fold_4	0.9274
 LR_fold_0	0.6406
@@ -9,11 +9,11 @@ LR_fold_1	0.6442
 LR_fold_2	0.6439
 LR_fold_3	0.6396
 LR_fold_4	0.6425
-MLP_fold_0	0.6153
-MLP_fold_1	0.6293
-MLP_fold_2	0.5719
-MLP_fold_3	0.5932
-MLP_fold_4	0.6161
+MLP_fold_0	0.6065
+MLP_fold_1	0.6154
+MLP_fold_2	0.6141
+MLP_fold_3	0.6067
+MLP_fold_4	0.5818
 NB_fold_0	0.3836
 NB_fold_1	0.3499
 NB_fold_2	0.3625

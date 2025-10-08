@@ -1,0 +1,11 @@
+Model,Optimal Hyperparameter Values
+GraBoost (stacked),"n_estimators: 146 learning_rate: 0.01596950334578271 max_depth: 15,  min_samples_leaf: 42 subsample: 0.5909124836035503"
+AdaBoost (stacked),n_estimators: 200 learning_rate: 0.07286124900578073
+CatBoost (stacked),"iterations: 135 learning_rate: 0.25270630381399795 depth: 6,  l2_leaf_reg: 1.4654355982058695"
+LightBoost (stacked),"n_estimators: 185 learning_rate: 0.01596950334578271 max_depth: 19,  num_leaves: 30 min_child_samples: 84"
+XGBoost (stacked),n_estimators: 380 max_depth: 15 subsample: 0.9829727315201009 colsample_bytree: 0.9821163261855509  gamma: 2.754057872914979 reg_alpha: 9.293502339665233  reg_lambda: 9.04947413810599
+SVM,C: 1.0 kernel: rbf gamma: scale probability: True
+DT,Max_depth: 86 criterion: gini splitter: random
+LR,solver: saga penalty: none C: 375
+NB,var_smooting: 0.008562512157013471
+MLP,"hidden_layer_sizes: (75, 57) penaalphalty: 0.08324593965363418 learning_rate: constant learning_rate_init: 0.01826431422398935  max_iter: 17"
