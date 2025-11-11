@@ -24,11 +24,11 @@ accuracy_objects_dict["F1_score"] = F1_score()
 
 # import models --- > baselines
 models_object_dict = dict()
-models_object_dict["SVM"] = SVM()
-models_object_dict["NB"] = NB()
-models_object_dict["LR"] = LR()
-models_object_dict["MLP"] = MLP()
-models_object_dict["DT"] = DTree()
+models_object_dict["XGBoost"] = XGBoost()
+models_object_dict["CatBoost"] = CatB()
+models_object_dict["LightBoost"] = LightB()
+models_object_dict["AdaBoost"] = AdaBoost()
+models_object_dict["GraBoost"] = GBC()
 
 
 DATA_PATH = r'./data/raw/'
@@ -50,17 +50,9 @@ meta_features_testX, meta_features_testY, result_dataframe = return_metafeatures
 # use XGBoost as stacked model.............................................
 stacked_model_dict = dict()
 stacked_model_dict["XGBoost"] = XGBoost()
-stacked_model_dict["CatBoost"] = CatB()
-stacked_model_dict["LightBoost"] = LightB()
-stacked_model_dict["AdaBoost"] = AdaBoost()
-stacked_model_dict["GraBoost"] = GBC()
 
-results_stacked = stacked_model_object_dictAND_accuracy_dict(meta_features_trainX, meta_features_trainY, meta_features_testX, 
-                                           meta_features_testY, stacked_model_dict, accuracy_objects_dict)
 
-print("Print and save final results")
-for key in results_stacked.keys():
-    result_dataframe[str(key) + str(" (stacked)")] = results_stacked[key]
+
 df = pd.DataFrame.from_dict(result_dataframe, orient="index")
 df.to_csv(path / "defaultHyperparameters.txt", index = True, sep = "\t")
 

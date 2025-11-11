@@ -49,112 +49,6 @@ INTIAL_POINTS =5
 N_ITERATIONS = 50
 cv_strategy = StratifiedKFold(n_splits=5)
 
-############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR SVM ###############################
-"""
-start = time.time()
-opt_func = partial(optimize_svm, X= X_train, y=y_train, cv=cv_strategy)
-optimizer = BayesianOptimization(
-    f=opt_func,
-    pbounds=svm_bounds,
-    random_state=42,
-    verbose=2
-)
-
-optimizer.maximize(init_points = INTIAL_POINTS, n_iter = N_ITERATIONS)
-SVM_optimal_hyperparameter_values = optimizer.max
-
-C = C_map[round(SVM_optimal_hyperparameter_values["params"]["C"] )]
-
-models_object_dict["SVM"] = SVM()
-models_object_dict_time["SVM"] = time.time() - start
-"""
-models_object_dict["SVM"] = SVM()
-models_object_dict_time["SVM"] = 0
-
-############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR DT #################################
-start = time.time()
-opt_func = partial(optimize_dtree, X= X_train, y=y_train, cv=cv_strategy)
-optimizer = BayesianOptimization(
-    f=opt_func,
-    pbounds=dtbounds,
-    random_state=42,
-    verbose=2
-)
-
-optimizer.maximize(init_points = INTIAL_POINTS, n_iter = N_ITERATIONS)
-DT_optimal_hyperparameter_values = optimizer.max
-
-criterion = criterion_map[round(DT_optimal_hyperparameter_values["params"]["criterion"] )]
-splitter = splitter_map[round(DT_optimal_hyperparameter_values["params"]['splitter'])]
-
-models_object_dict["DT"] = DTree(criterion = criterion, 
-                                 max_depth = DT_optimal_hyperparameter_values["params"]['max_depth'], 
-                                 splitter = splitter)
-
-models_object_dict_time["DT"] = time.time() - start
-
-
-############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR LR #################################
-start = time.time()
-opt_func = partial(optimize_lr, X = X_train, y = y_train, cv = cv_strategy)
-optimizer = BayesianOptimization(
-    f=opt_func,
-    pbounds=lrpbounds,
-    random_state=42,
-    verbose=2
-)
-
-optimizer.maximize(init_points= INTIAL_POINTS, n_iter=N_ITERATIONS)
-lr_optimal_hyperparameter_values = optimizer.max
-
-solver = solver_map[round(lr_optimal_hyperparameter_values["params"]["solver"])]
-penalty = penalty_map[round(lr_optimal_hyperparameter_values["params"]["penalty"])]
-C = round(lr_optimal_hyperparameter_values["params"]["C"])
-
-models_object_dict["LR"] = LR(solver = solver, penalty = penalty, C = C)
-models_object_dict_time["LR"] = time.time() - start
-############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR NB #################################
-start  = time.time()
-opt_func = partial(optimize_nb, X = X_train, y = y_train, cv = cv_strategy)
-optimizer = BayesianOptimization(
-    f=opt_func,
-    pbounds=nb_pbounds,
-    random_state=42,
-    verbose=2
-)
-
-optimizer.maximize(init_points= INTIAL_POINTS, n_iter=N_ITERATIONS)
-nb_optimal_hyperparameter_values = optimizer.max
-models_object_dict["NB"] = NB(var_smoothing = nb_optimal_hyperparameter_values['params']['var_smoothing'])
-models_object_dict_time["NB"] = time.time() - start
-
-############################# FIND OPTIMAL HYPER-PARAMETER VALUES FOR MLP #################################
-start = time.time()
-opt_func = partial(optimize_mlp, X = X_train, y = y_train, cv = cv_strategy)
-optimizer = BayesianOptimization(
-    f=opt_func,
-    pbounds=MLPpbounds,
-    random_state=42,
-    verbose=2
-)
-
-optimizer.maximize(init_points= INTIAL_POINTS, n_iter=N_ITERATIONS)
-mLP_optimal_hyperparameter_values = optimizer.max
-
-hidden1 = round(mLP_optimal_hyperparameter_values["params"]["units1"])
-hidden2 = round(mLP_optimal_hyperparameter_values["params"]["units2"])
-alpha = mLP_optimal_hyperparameter_values["params"]["alpha"]
-learning_rate = lr_map[round(mLP_optimal_hyperparameter_values["params"]["learning_rate"])]
-learning_rate_init = mLP_optimal_hyperparameter_values["params"]["learning_rate_init"]
-max_iter = round(mLP_optimal_hyperparameter_values["params"]["max_iter"])
-
-
-models_object_dict["MLP"] = MLP(hidden_layer_sizes = (hidden1, hidden2), alpha = alpha,
-                 learning_rate = learning_rate, learning_rate_init = learning_rate_init, max_iter = max_iter)
-models_object_dict_time["MLP"] = time.time() - start
-
-
-############################# ACCURACY MEASURES #################################
 accuracy_objects_dict = dict()
 accuracy_objects_dict["Accuracy"] = Acc()
 accuracy_objects_dict["Precision"] = Precision()
@@ -162,6 +56,7 @@ accuracy_objects_dict["Recall"] = Recall()
 accuracy_objects_dict["F1_score"] = F1_score()
 path = Path("results/multi/optimalhyperparameter/")
 path.mkdir(parents=True, exist_ok=True)
+
 
 meta_features_trainX, meta_features_trainY = k_fold_return_meta_features(X_train, y_train, models_object_dict, 
                                                                             accuracy_objects_dict, path)
@@ -326,7 +221,6 @@ results_stacked = stacked_model_object_dictAND_accuracy_dict(meta_features_train
 print("Print and save final results")
 for key in results_stacked.keys():
     result_dataframe[key] = results_stacked[key]
-
 for key in models_object_dict_time.keys():
     result_dataframe[key]["tuning_time"] = models_object_dict_time[key]
 

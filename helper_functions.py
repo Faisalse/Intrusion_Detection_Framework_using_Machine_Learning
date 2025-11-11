@@ -54,7 +54,7 @@ def apply_random_scaling_df_local(df, ratio=0.1, seed=43):
 
 
 def k_fold_return_meta_features(X_train, y_train, models_object_dict, accuracy_objects_dict, path, n_splits = 5, 
-                                random_state = 42, attack = False):
+                                random_state = 42):
     X_train = X_train.to_numpy()
     y_train = y_train.to_numpy()
     
@@ -66,6 +66,15 @@ def k_fold_return_meta_features(X_train, y_train, models_object_dict, accuracy_o
 
     # We are using out of fold strategy to avoid data leakage issue............
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+
+
+    original_features = pd.DataFrame()
+    for fold, (train_index, test_index) in enumerate(skf.split(X_train, y_train)):
+        X = X_train[test_index]
+        y = y_train[test_index]
+        df = pd.DataFrame(X)
+        df["label"] = y
+        original_features = pd.concat([original_features, df], ignore_index=True)
 
     result_dataframe = dict()
     for fold, (train_index, test_index) in enumerate(skf.split(X_train, y_train)):
@@ -91,10 +100,7 @@ def k_fold_return_meta_features(X_train, y_train, models_object_dict, accuracy_o
 
         meta_y.append(y_train[test_index])   
     
-    if attack == False:
-        result_dataframe = pd.DataFrame.from_dict(result_dataframe, orient='index')
-        path = path / "results_with_folding.csv"
-        result_dataframe.to_csv(path, sep = "\t")
+    
 
     meta_features_df = pd.DataFrame()
     for key, value in meta_features.items():
@@ -106,7 +112,7 @@ def k_fold_return_meta_features(X_train, y_train, models_object_dict, accuracy_o
     meta_features_df.columns = new_column_names
     meta_features_y = [item   for sublist in meta_y for item in list(sublist)]
 
-    return meta_features_df, meta_features_y
+    return meta_features_df, meta_features_y, original_features
 
 
 

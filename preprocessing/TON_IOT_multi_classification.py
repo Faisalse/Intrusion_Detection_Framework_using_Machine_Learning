@@ -98,8 +98,6 @@ def data_load(path, name):
     print("Number of missing values   ", X.isnull().sum().sum())
     return X, y
 
-
-
 def data_load_global_attacked(path, name, value = 0.1):
     path_name = path+name+".csv"
     data = pd.read_csv(path_name)

@@ -17,17 +17,21 @@ class RF:
         self.min_samples_leaf = min_samples_leaf
         
     def fit(self, X, y):
-        clf = RandomForestClassifier(n_estimators = self.n_estimators, max_depth = self.max_depth,
+        model = RandomForestClassifier(n_estimators = self.n_estimators, max_depth = self.max_depth,
                                      min_samples_split = self.min_samples_split,
                                      min_samples_leaf = self.min_samples_leaf)
         
-        clf.fit(X, y)
-        self.clf = clf
+        model.fit(X, y)
+        self.model = model
         
     def predict(self, X):
-        y_predict = self.clf.predict(X)
-        y_predict_prob = self.clf.predict_proba(X)
-        return y_predict, y_predict_prob
+        y_predict = self.model.predict(X)
+        return y_predict
+    
+    def predict_proba(self, X):
+
+        y_predict_prob = self.model.predict_proba(X)
+        return y_predict_prob
     
     def clear(self):
         self.n_estimators = 0
